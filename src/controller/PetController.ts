@@ -26,34 +26,34 @@ export default class PetController {
         return res.status(201).json(novoPet);
     }
 
-    async listaPets(req: Request, res: Response) {
+    async listaPet(req: Request, res: Response) {
         const listaDePets = await this.repository.listaPet();
         return res.status(200).json(listaDePets);
     }
 
-    atualizaPet(req: Request, res: Response) {
+    async atualizaPet(req: Request, res: Response) {
         const {id} = req.params;
         const {adotado, especie, dataDeNascimento, nome} = req.body as TipoPet;
-        const pet = listaDePets.find((pet) => pet.id === Number(id));
-        if(!pet){
-            return res.status(404).json({erro: "Pet não encontrado!"});
-        }
 
-        pet.nome = nome;
-        pet.dataDeNascimento = dataDeNascimento;
-        pet.especie = especie;
-        pet.adotado = adotado;
-        return res.status(200).json(pet);
+        const newData = new PetEntity();
+        newData.nome = nome;
+        newData.dataDeNascimento = dataDeNascimento;
+        newData.especie = especie;
+        newData.adotado = adotado;
+
+        const result = await this.repository.atualizaPet(Number(id), newData);
+        if (!result.success) {
+            return res.status(404).json({erro: result.message || "Pet não encontrado!"});
+        }
+        return res.status(200).json({mensagem: "Pet atualizado com sucesso!"});
     }
 
-    deletaPet(req: Request, res: Response) {
-       const {id} = req.params;
-        const pet = listaDePets.find((pet) => pet.id === Number(id));
-        if(!pet){
-            return res.status(404).json({erro: "Pet não encontrado!"});
+    async deletaPet(req: Request, res: Response) {
+        const {id} = req.params;
+        const result = await this.repository.deletaPet(Number(id), new PetEntity());
+        if(!result.success){
+            return res.status(404).json({erro: result.message || "Pet não encontrado!"});
         }
-        const index = listaDePets.indexOf(pet);
-        listaDePets.splice(index, 1);
-        return res.status(200).json({mensagem: "Pet deletado com sucesso!"})
+        return res.status(200).json({mensagem: "Pet deletado com sucesso!"});
     }
 }

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import type TipoPet from "../tipos/TipoPet";
 import EnumEspecie from "../enum/EnumEspecie";
-import { error } from "console";
 import PetRepository from "../respositories/petRepository";
 import PetEntity from "../entities/PetEntity";
 
@@ -17,11 +16,7 @@ export default class PetController {
                 return res.status(400).json({error: "Espécie Inválida"})
             }
 
-        const novoPet = new PetEntity();
-        (novoPet.adotado = adotado);
-        (novoPet.especie = especie);
-        (novoPet.dataDeNascimento = dataDeNascimento);
-        (novoPet.nome = nome);
+        const novoPet = new PetEntity(nome, especie, dataDeNascimento, adotado);
         await this.repository.criaPet(novoPet);
         return res.status(201).json(novoPet);
     }
@@ -35,7 +30,7 @@ export default class PetController {
         const {id} = req.params;
         const {adotado, especie, dataDeNascimento, nome} = req.body as TipoPet;
 
-        const newData = new PetEntity();
+        const newData = new PetEntity(nome, especie, dataDeNascimento, adotado);
         newData.nome = nome;
         newData.dataDeNascimento = dataDeNascimento;
         newData.especie = especie;
@@ -50,7 +45,7 @@ export default class PetController {
 
     async deletaPet(req: Request, res: Response) {
         const {id} = req.params;
-        const result = await this.repository.deletaPet(Number(id), new PetEntity());
+        const result = await this.repository.deletaPet(Number(id), new PetEntity("", undefined as never, undefined as never, false));
         if(!result.success){
             return res.status(404).json({erro: result.message || "Pet não encontrado!"});
         }

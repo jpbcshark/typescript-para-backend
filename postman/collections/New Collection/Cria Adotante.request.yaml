@@ -1,0 +1,16 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/adotantes
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"nome\": \"João Paulo\",\r
+
+    \    \"senha\": \"123456\",\r
+
+    \    \"celular\": \"99991234\"\r
+
+    }"
+order: 1000

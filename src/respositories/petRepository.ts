@@ -1,29 +1,36 @@
 import { Repository } from "typeorm";
 import PetEntity from "../entities/PetEntity";
+import AdotanteRepository from "./AdotanteRepository";
+import AdotanteEntity from "../entities/AdotanteEntity";
 
 export default class PetRepository {
-  private repository: Repository<PetEntity>;
+  private petRepository: Repository<PetEntity>;
+  private adotanteRepository: Repository<AdotanteEntity>;
 
-  constructor(repository: Repository<PetEntity>) {
-    this.repository = repository;
+  constructor(
+    petRepository: Repository<PetEntity>,
+    AdotanteRepository: Repository<AdotanteEntity>,
+  ) {
+    this.petRepository = petRepository;
+    this.adotanteRepository = AdotanteRepository;
   }
   async criaPet(pet: PetEntity): Promise<PetEntity> {
-    return this.repository.save(pet);
+    return this.petRepository.save(pet);
   }
   async listaPet(): Promise<Array<PetEntity>> {
-    return await this.repository.find();
+    return await this.petRepository.find();
   }
   async atualizaPet(
     id: number,
     newData: PetEntity,
   ): Promise<{ success: boolean; message?: string }> {
     try {
-      const petToUpdate = await this.repository.findOne({ where: { id } });
+      const petToUpdate = await this.petRepository.findOne({ where: { id } });
       if (!petToUpdate) {
         return { success: false, message: "Pet não encontrado" };
       }
       Object.assign(petToUpdate, newData);
-      await this.repository.save(petToUpdate);
+      await this.petRepository.save(petToUpdate);
       return { success: true };
     } catch (error) {
       console.log(error);
@@ -35,11 +42,11 @@ export default class PetRepository {
     pet: PetEntity,
   ): Promise<{ success: boolean; message?: string }> {
     try {
-      const petToRemove = await this.repository.findOne({ where: { id } });
+      const petToRemove = await this.petRepository.findOne({ where: { id } });
       if (!petToRemove) {
         return { success: false, message: "Pet não encontrado" };
       }
-      await this.repository.delete(id);
+      await this.petRepository.delete(id);
       return { success: true };
     } catch (error) {
       return {
@@ -47,5 +54,27 @@ export default class PetRepository {
         message: "Ocorreu um erro ao tentar excluir o pet.",
       };
     }
+  }
+
+  async adotaPet(
+    idPet: number,
+    idAdotante: number,
+  ): Promise<{ success: boolean; message?: string }> {
+    const pet = await this.petRepository.findOne({ where: { id: idPet } });
+    if (!pet) {
+      return { success: false, message: "Pet não encontrado!" };
+    }
+
+    const adotante = await this.adotanteRepository.findOne({
+      where: { id: idAdotante },
+    });
+    if (!adotante) {
+      return { success: false, message: "Adotante não encontrado!" };
+    }
+
+    pet.adotante = adotante;
+    pet.adotado = true;
+    await this.petRepository.save(pet);
+    return { success: true };
   }
 }

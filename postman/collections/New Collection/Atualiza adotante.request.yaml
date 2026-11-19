@@ -1,0 +1,14 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/adotantes/1
+method: PATCH
+body:
+  type: json
+  content: "{\r
+
+    \    \"cidade\": \"Adamantina\",\r
+
+    \    \"estado\": \"São Paulo\"\r
+
+    }"
+order: 3000

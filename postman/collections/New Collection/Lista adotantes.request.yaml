@@ -1,5 +1,5 @@
 $kind: http-request
 description: ""
-url: http://localhost:3000/adotantes
+url: http://localhost:3000/pets
 method: GET
 order: 2000

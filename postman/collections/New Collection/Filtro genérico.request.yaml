@@ -1,0 +1,14 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/pets/filtro?campo=porte&valor=pequeno
+method: GET
+queryParams:
+  - key: campo
+    value: porte
+    disabled: false
+    description: ""
+  - key: valor
+    value: pequeno
+    disabled: false
+    description: ""
+order: 7000

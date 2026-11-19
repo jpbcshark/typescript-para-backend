@@ -1,0 +1,8 @@
+$kind: http-request
+description: ""
+url: http://localhost:3000/pets/4/1
+method: PUT
+body:
+  type: json
+  content: ""
+order: 6000

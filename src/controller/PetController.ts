@@ -3,6 +3,7 @@ import type TipoPet from "../tipos/TipoPet";
 import EnumEspecie from "../enum/EnumEspecie";
 import PetRepository from "../respositories/petRepository";
 import PetEntity from "../entities/PetEntity";
+import EnumPorte from "../enum/EnumPorte";
 
 let listaDePets:Array<TipoPet> = [];
 
@@ -11,12 +12,15 @@ export default class PetController {
 
     }
     async criaPet(req: Request, res: Response) {
-        const {adotado,especie,dataDeNascimento,nome} = req.body as PetEntity;
+        const {adotado,especie,dataDeNascimento,nome,porte} = req.body as PetEntity;
             if(!Object.values(EnumEspecie).includes(especie)){
                 return res.status(400).json({error: "Espécie Inválida"})
             }
+             if(porte && !(porte in EnumPorte)){
+                return res.status(400).json({error: "Porte Inválido"})
+            }
 
-        const novoPet = new PetEntity(nome, especie, dataDeNascimento, adotado);
+        const novoPet = new PetEntity(nome, especie, dataDeNascimento, adotado, porte);
         await this.repository.criaPet(novoPet);
         return res.status(201).json(novoPet);
     }
@@ -62,6 +66,16 @@ export default class PetController {
         if(!success){
             return res.status(404).json({message: "Pet não encontrado para adoção!"})
         }
-        res.sendStatus(204);
+        res.sendStatus(204)
     }
+
+    async buscaPetPorCampoGenerico(req: Request, res: Response) {
+        const {campo, valor} = req.query;
+        const petEncontrado = await this.repository.buscaPetPorCampoGenerico(campo as keyof PetEntity, valor as string);
+        if(petEncontrado){
+            return res.status(200).json(petEncontrado);
+        } else{
+           return res.status(404).json({mensagem: "Pet não encontrado"});
+        }
+    }    
 }

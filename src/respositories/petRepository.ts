@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import PetEntity from "../entities/PetEntity";
 import AdotanteRepository from "./AdotanteRepository";
 import AdotanteEntity from "../entities/AdotanteEntity";
+import EnumPorte from "../enum/EnumPorte";
 
 export default class PetRepository {
   private petRepository: Repository<PetEntity>;
@@ -76,5 +77,12 @@ export default class PetRepository {
     pet.adotado = true;
     await this.petRepository.save(pet);
     return { success: true };
+  }
+  async buscaPetPorCampoGenerico<Tipo extends keyof PetEntity>(
+    campo: Tipo,
+    valor: PetEntity[Tipo],
+  ): Promise<PetEntity[]> {
+    const petEncontrado = await this.petRepository.find({ where: { [campo]: valor } });
+    return petEncontrado;
   }
 }
